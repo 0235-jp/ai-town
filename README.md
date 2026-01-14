@@ -1,83 +1,66 @@
 # AI Town 🏠💻💌
 
-[Live Demo](https://www.convex.dev/ai-town)
+[ライブデモ](https://www.convex.dev/ai-town)
 
-[Join our community Discord: AI Stack Devs](https://discord.gg/PQUmTBTGmT)
+[コミュニティDiscordに参加: AI Stack Devs](https://discord.gg/PQUmTBTGmT)
 
 <img width="1454" alt="Screen Shot 2023-08-14 at 10 01 00 AM" src="https://github.com/a16z-infra/ai-town/assets/3489963/a4c91f17-23ed-47ec-8c4e-9f9a8505057d">
 
-AI Town is a virtual town where AI characters live, chat and socialize.
+AI Townは、AIキャラクターが生活し、チャットし、交流する仮想の町です。
 
-This project is a deployable starter kit for easily building and customizing your own version of AI
-town. Inspired by the research paper
-[_Generative Agents: Interactive Simulacra of Human Behavior_](https://arxiv.org/pdf/2304.03442.pdf).
+このプロジェクトは、独自のAI Townバージョンを簡単に構築・カスタマイズするためのデプロイ可能なスターターキットです。研究論文[_Generative Agents: Interactive Simulacra of Human Behavior_](https://arxiv.org/pdf/2304.03442.pdf)にインスパイアされています。
 
-The primary goal of this project, beyond just being a lot of fun to work on, is to provide a
-platform with a strong foundation that is meant to be extended. The back-end natively supports
-shared global state, transactions, and a simulation engine and should be suitable from everything
-from a simple project to play around with to a scalable, multi-player game. A secondary goal is to
-make a JS/TS framework available as most simulators in this space (including the original paper
-above) are written in Python.
+このプロジェクトの主な目標は、楽しく作業できることに加えて、拡張を前提とした強固な基盤を持つプラットフォームを提供することです。バックエンドはグローバル共有状態、トランザクション、シミュレーションエンジンをネイティブサポートしており、ちょっとした遊びのプロジェクトからスケーラブルなマルチプレイヤーゲームまで対応できます。副次的な目標として、この分野のシミュレーター（上記の論文を含む）のほとんどがPythonで書かれているため、JS/TSフレームワークを利用可能にすることがあります。
 
-## Overview
+## 概要
 
-- 💻 [Stack](#stack)
-- 🧠 [Installation](#installation) (cloud, local, Docker, self-host, Fly.io, ...)
-- 💻️ [Windows Pre-requisites](#windows-installation)
-- 🤖 [Configure your LLM of choice](#connect-an-llm) (Ollama, OpenAI, Together.ai, ...)
-- 👤 [Customize - YOUR OWN simulated world](#customize-your-own-simulation)
-- 👩‍💻 [Deploying to production](#deploy-the-app-to-production)
-- 🐛 [Troubleshooting](#troubleshooting)
+- 💻 [技術スタック](#技術スタック)
+- 🧠 [インストール](#インストール)（クラウド、ローカル、Docker、セルフホスト、Fly.io等）
+- 💻️ [Windows前提条件](#windowsインストール)
+- 🤖 [LLMの設定](#llmに接続する)（Ollama、OpenAI、Together.ai等）
+- 👤 [カスタマイズ - 独自のシミュレーションワールド](#独自のシミュレーションをカスタマイズ)
+- 👩‍💻 [本番環境へのデプロイ](#アプリを本番環境にデプロイ)
+- 🐛 [トラブルシューティング](#トラブルシューティング)
 
-## Stack
+## 技術スタック
 
-- Game engine, database, and vector search: [Convex](https://convex.dev/)
-- Auth (Optional): [Clerk](https://clerk.com/)
-- Default chat model is `llama3` and embeddings with `mxbai-embed-large`.
-- Local inference: [Ollama](https://github.com/jmorganca/ollama)
-- Configurable for other cloud LLMs: [Together.ai](https://together.ai/) or anything that speaks the
-  [OpenAI API](https://platform.openai.com/). PRs welcome to add more cloud provider support.
-- Background Music Generation: [Replicate](https://replicate.com/) using
-  [MusicGen](https://huggingface.co/spaces/facebook/MusicGen)
+- ゲームエンジン、データベース、ベクトル検索: [Convex](https://convex.dev/)
+- 認証（オプション）: [Clerk](https://clerk.com/)
+- デフォルトのチャットモデルは`llama3`、エンベディングは`mxbai-embed-large`
+- ローカル推論: [Ollama](https://github.com/jmorganca/ollama)
+- 他のクラウドLLM用に設定可能: [Together.ai](https://together.ai/)または[OpenAI API](https://platform.openai.com/)を話すもの。他のクラウドプロバイダーサポート追加のPRは歓迎
+- 背景音楽生成: [Replicate](https://replicate.com/)で[MusicGen](https://huggingface.co/spaces/facebook/MusicGen)を使用
 
-Other credits:
+その他のクレジット:
 
-- Pixel Art Generation: [Replicate](https://replicate.com/),
-  [Fal.ai](https://serverless.fal.ai/lora)
-- All interactions, background music and rendering on the <Game/> component in the project are
-  powered by [PixiJS](https://pixijs.com/).
-- Tilesheet:
+- ピクセルアート生成: [Replicate](https://replicate.com/)、[Fal.ai](https://serverless.fal.ai/lora)
+- プロジェクト内の<Game/>コンポーネントでのすべてのインタラクション、背景音楽、レンダリングは[PixiJS](https://pixijs.com/)で動作
+- タイルシート:
   - https://opengameart.org/content/16x16-game-assets by George Bailey
   - https://opengameart.org/content/16x16-rpg-tileset by hilau
-- We used https://github.com/pierpo/phaser3-simple-rpg for the original POC of this project. We have
-  since re-wrote the whole app, but appreciated the easy starting point
-- Original assets by [ansimuz](https://opengameart.org/content/tiny-rpg-forest)
-- The UI is based on original assets by
-  [Mounir Tohami](https://mounirtohami.itch.io/pixel-art-gui-elements)
+- このプロジェクトの元のPOCには https://github.com/pierpo/phaser3-simple-rpg を使用。その後アプリ全体を書き直しましたが、簡単なスタートポイントとして感謝
+- オリジナルアセット by [ansimuz](https://opengameart.org/content/tiny-rpg-forest)
+- UIは[Mounir Tohami](https://mounirtohami.itch.io/pixel-art-gui-elements)のオリジナルアセットに基づく
 
-# Installation
+# インストール
 
-The overall steps are:
+全体的な手順:
 
-1. [Build and deploy](#build-and-deploy)
-2. [Connect it to an LLM](#connect-an-llm)
+1. [ビルドとデプロイ](#ビルドとデプロイ)
+2. [LLMに接続する](#llmに接続する)
 
-## Build and Deploy
+## ビルドとデプロイ
 
-There are a few ways to run the app on top of Convex (the backend).
+Convex（バックエンド）上でアプリを実行するいくつかの方法があります。
 
-1. The standard Convex setup, where you develop locally or in the cloud. This requires a Convex
-   account(free). This is the easiest way to depoy it to the cloud and seriously develop.
-2. If you want to try it out without an account and you're okay with Docker, the Docker Compose
-   setup is nice and self-contained.
-3. There's a community fork of this project offering a one-click install on
-   [Pinokio](https://pinokio.computer/item?uri=https://github.com/cocktailpeanutlabs/aitown) for
-   anyone interested in running but not modifying it 😎.
-4. You can also deploy it to [Fly.io](https://fly.io/). See [./fly](./fly) for instructions.
+1. 標準的なConvexセットアップ。ローカルまたはクラウドで開発。Convexアカウント（無料）が必要。クラウドへのデプロイと本格的な開発に最も簡単な方法
+2. Dockerで試したい場合でアカウント不要なら、Docker Composeセットアップが便利で自己完結型
+3. [Pinokio](https://pinokio.computer/item?uri=https://github.com/cocktailpeanutlabs/aitown)でワンクリックインストールを提供するコミュニティフォークもあり、実行するだけで変更しない人向け 😎
+4. [Fly.io](https://fly.io/)にデプロイすることも可能。[./fly](./fly)を参照
 
-### Standard Setup
+### 標準セットアップ
 
-Note, if you're on Windows, see [below](#windows-installation).
+注: Windowsの場合は[下記](#windowsインストール)を参照。
 
 ```sh
 git clone https://github.com/a16z-infra/ai-town.git
@@ -85,160 +68,146 @@ cd ai-town
 npm install
 ```
 
-This will require logging into your Convex account, if you haven't already.
+これにはConvexアカウントへのログインが必要です（まだの場合）。
 
-To run it:
+実行するには:
 
 ```sh
 npm run dev
 ```
 
-You can now visit http://localhost:5173.
+これで http://localhost:5173 にアクセスできます。
 
-If you'd rather run the frontend and backend separately (which syncs your backend functions as
-they're saved), you can run these in two terminals:
+フロントエンドとバックエンドを別々に実行したい場合（保存時にバックエンド関数を同期）、2つのターミナルでこれらを実行:
 
 ```bash
 npm run dev:frontend
 npm run dev:backend
 ```
 
-See [package.json](./package.json) for details.
+詳細は[package.json](./package.json)を参照。
 
-### Using Docker Compose with self-hosted Convex
+### Docker ComposeでセルフホストされたConvexを使用
 
-You can also run the Convex backend with the self-hosted Docker container. Here we'll set it up to
-run the frontend, backend, and dashboard all via docker compose.
+ConvexバックエンドをセルフホストされたDockerコンテナで実行することもできます。ここではフロントエンド、バックエンド、ダッシュボードすべてをdocker composeで実行するように設定します。
 
 ```sh
 docker compose up --build -d
 ```
 
-The container will keep running in the background if you pass `-d`. After you've done it once, you
-can `stop` and `start` services.
+`-d`を渡すとコンテナはバックグラウンドで実行し続けます。一度実行したら、サービスを`stop`と`start`できます。
 
-- The frontend will be running on http://localhost:5173.
-- The backend will be running on http://localhost:3210 (3211 for the http api).
-- The dashboard will be running on http://localhost:6791.
+- フロントエンドは http://localhost:5173 で実行
+- バックエンドは http://localhost:3210（http apiは3211）で実行
+- ダッシュボードは http://localhost:6791 で実行
 
-To log into the dashboard and deploy from the convex CLI, you will need to generate an admin key.
+ダッシュボードにログインしてconvex CLIからデプロイするには、管理キーを生成する必要があります。
 
 ```sh
 docker compose exec backend ./generate_admin_key.sh
 ```
 
-Add it to your `.env.local` file. Note: If you run `down` and `up`, you'll have to generate the key
-again and update the `.env.local` file.
+`.env.local`ファイルに追加します。注: `down`して`up`すると、キーを再生成して`.env.local`ファイルを更新する必要があります。
 
 ```sh
-# in .env.local
-CONVEX_SELF_HOSTED_ADMIN_KEY="<admin-key>" # Ensure there are quotes around it
+# .env.localに
+CONVEX_SELF_HOSTED_ADMIN_KEY="<admin-key>" # 引用符で囲むこと
 CONVEX_SELF_HOSTED_URL="http://127.0.0.1:3210"
 ```
 
-Then set up the Convex backend (one time):
+次にConvexバックエンドをセットアップ（初回のみ）:
 
 ```sh
 npm run predev
 ```
 
-To continuously deploy new code to the backend and print logs:
+バックエンドに新しいコードを継続的にデプロイしてログを出力するには:
 
 ```sh
 npm run dev:backend
 ```
 
-To see the dashboard, visit `http://localhost:6791` and provide the admin key you generated earlier.
+ダッシュボードを見るには、`http://localhost:6791`にアクセスして先ほど生成した管理キーを入力します。
 
-### Configuring Docker for Ollama
+### OllamaのためのDocker設定
 
-If you'll be using Ollama for local inference, you'll need to configure Docker to connect to it.
+ローカル推論にOllamaを使用する場合、Dockerが接続できるように設定する必要があります。
 
 ```sh
 npx convex env set OLLAMA_HOST http://host.docker.internal:11434
 ```
 
-To test the connection (after you [have it running](#ollama-default)):
+接続をテストするには（[実行後](#ollamaデフォルト)）:
 
 ```sh
 docker compose exec backend /bin/bash curl http://host.docker.internal:11434
 ```
 
-If it says "Ollama is running", it's good! Otherwise, check out the
-[Troubleshooting](#troubleshooting) section.
+「Ollama is running」と表示されれば成功です！そうでなければ[トラブルシューティング](#トラブルシューティング)セクションを確認してください。
 
-## Connect an LLM
+## LLMに接続する
 
-Note: If you want to run the backend in the cloud, you can either use a cloud-based LLM API, like
-OpenAI or Together.ai or you can proxy the traffic from the cloud to your local Ollama. See
-[below](#using-local-inference-from-a-cloud-deployment) for instructions.
+注: クラウドでバックエンドを実行したい場合、クラウドベースのLLM API（OpenAIやTogether.aiなど）を使用するか、クラウドからローカルのOllamaへトラフィックをプロキシできます。手順は[下記](#クラウドデプロイからローカル推論を使用する)を参照。
 
-### Ollama (default)
+### Ollama（デフォルト）
 
-By default, the app tries to use Ollama to run it entirely locally.
+デフォルトでは、アプリは完全にローカルで実行するためにOllamaを使用しようとします。
 
-1. Download and install [Ollama](https://ollama.com/).
-2. Open the app or run `ollama serve` in a terminal. `ollama serve` will warn you if the app is
-   already running.
-3. Run `ollama pull llama3` to have it download `llama3`.
-4. Test it out with `ollama run llama3`.
+1. [Ollama](https://ollama.com/)をダウンロードしてインストール
+2. アプリを開くか、ターミナルで`ollama serve`を実行。`ollama serve`はアプリが既に実行中の場合警告を表示
+3. `ollama pull llama3`を実行して`llama3`をダウンロード
+4. `ollama run llama3`でテスト
 
-Ollama model options can be found [here](https://ollama.ai/library).
+Ollamaモデルオプションは[こちら](https://ollama.ai/library)。
 
-If you want to customize which model to use, adjust convex/util/llm.ts or set
-`npx convex env set OLLAMA_MODEL # model`. If you want to edit the embedding model:
+使用するモデルをカスタマイズしたい場合は、convex/util/llm.tsを調整するか`npx convex env set OLLAMA_MODEL # モデル`を設定。エンベディングモデルを編集する場合:
 
-1. Change the `OLLAMA_EMBEDDING_DIMENSION` in `convex/util/llm.ts` and ensure:
+1. `convex/util/llm.ts`の`OLLAMA_EMBEDDING_DIMENSION`を変更し、以下を確認:
    `export const EMBEDDING_DIMENSION = OLLAMA_EMBEDDING_DIMENSION;`
-2. Set `npx convex env set OLLAMA_EMBEDDING_MODEL # model`.
+2. `npx convex env set OLLAMA_EMBEDDING_MODEL # モデル`を設定
 
-Note: You might want to set `NUM_MEMORIES_TO_SEARCH` to `1` in constants.ts, to reduce the size of
-conversation prompts, if you see slowness.
+注: 遅さを感じる場合は、会話プロンプトのサイズを減らすために`constants.ts`の`NUM_MEMORIES_TO_SEARCH`を`1`に設定することを検討。
 
 ### OpenAI
 
-To use OpenAI, you need to:
+OpenAIを使用するには:
 
 ```ts
-// In convex/util/llm.ts change the following line:
+// convex/util/llm.tsで以下の行を変更:
 export const EMBEDDING_DIMENSION = OPENAI_EMBEDDING_DIMENSION;
 ```
 
-Set the `OPENAI_API_KEY` environment variable. Visit https://platform.openai.com/account/api-keys if
-you don't have one.
+`OPENAI_API_KEY`環境変数を設定。持っていない場合は https://platform.openai.com/account/api-keys を訪問。
 
 ```sh
 npx convex env set OPENAI_API_KEY 'your-key'
 ```
 
-Optional: choose models with `OPENAI_CHAT_MODEL` and `OPENAI_EMBEDDING_MODEL`.
+オプション: `OPENAI_CHAT_MODEL`と`OPENAI_EMBEDDING_MODEL`でモデルを選択。
 
 ### Together.ai
 
-To use Together.ai, you need to:
+Together.aiを使用するには:
 
 ```ts
-// In convex/util/llm.ts change the following line:
+// convex/util/llm.tsで以下の行を変更:
 export const EMBEDDING_DIMENSION = TOGETHER_EMBEDDING_DIMENSION;
 ```
 
-Set the `TOGETHER_API_KEY` environment variable. Visit https://api.together.xyz/settings/api-keys if
-you don't have one.
+`TOGETHER_API_KEY`環境変数を設定。持っていない場合は https://api.together.xyz/settings/api-keys を訪問。
 
 ```sh
 npx convex env set TOGETHER_API_KEY 'your-key'
 ```
 
-Optional: choose models via `TOGETHER_CHAT_MODEL`, `TOGETHER_EMBEDDING_MODEL`. The embedding model's
-dimension must match `EMBEDDING_DIMENSION`.
+オプション: `TOGETHER_CHAT_MODEL`、`TOGETHER_EMBEDDING_MODEL`でモデルを選択。エンベディングモデルの次元は`EMBEDDING_DIMENSION`と一致する必要あり。
 
-### Other OpenAI-compatible API
+### その他のOpenAI互換API
 
-You can use any OpenAI-compatible API, such as Anthropic, Groq, or Azure.
+Anthropic、Groq、Azureなど、OpenAI互換APIを使用できます。
 
-- Change the `EMBEDDING_DIMENSION` in `convex/util/llm.ts` to match the dimension of your embedding
-  model.
-- Edit `getLLMConfig` in `llm.ts` or set environment variables:
+- `convex/util/llm.ts`の`EMBEDDING_DIMENSION`をエンベディングモデルの次元に合わせて変更
+- `llm.ts`の`getLLMConfig`を編集するか環境変数を設定:
 
 ```sh
 npx convex env set LLM_API_URL 'your-url'
@@ -247,33 +216,25 @@ npx convex env set LLM_MODEL 'your-chat-model'
 npx convex env set LLM_EMBEDDING_MODEL 'your-embedding-model'
 ```
 
-Note: if `LLM_API_KEY` is not required, don't set it.
+注: `LLM_API_KEY`が不要な場合は設定しないでください。
 
-### Note on changing the LLM provider or embedding model:
+### LLMプロバイダーまたはエンベディングモデルの変更に関する注意:
 
-If you change the LLM provider or embedding model, you should delete your data and start over. The
-embeddings used for memory are based on the embedding model you choose, and the dimension of the
-vector database must match the embedding model's dimension. See
-[below](#wiping-the-database-and-starting-over) for how to do that.
+LLMプロバイダーまたはエンベディングモデルを変更する場合は、データを削除して最初からやり直す必要があります。メモリに使用されるエンベディングは選択したエンベディングモデルに基づいており、ベクトルデータベースの次元はエンベディングモデルの次元と一致する必要があります。方法は[下記](#データベースをワイプして最初からやり直す)を参照。
 
-## Customize your own simulation
+## 独自のシミュレーションをカスタマイズ
 
-NOTE: every time you change character data, you should re-run `npx convex run testing:wipeAllTables`
-and then `npm run dev` to re-upload everything to Convex. This is because character data is sent to
-Convex on the initial load. However, beware that `npx convex run testing:wipeAllTables` WILL wipe
-all of your data.
+注: キャラクターデータを変更するたびに、`npx convex run testing:wipeAllTables`を実行してから`npm run dev`を実行してすべてをConvexに再アップロードする必要があります。これはキャラクターデータが初回ロード時にConvexに送信されるためです。ただし、`npx convex run testing:wipeAllTables`はすべてのデータを消去することに注意。
 
-1. Create your own characters and stories: All characters and stories, as well as their spritesheet
-   references are stored in [characters.ts](./data/characters.ts). You can start by changing
-   character descriptions.
+1. 独自のキャラクターとストーリーを作成: すべてのキャラクターとストーリー、およびそのスプライトシート参照は[characters.ts](./data/characters.ts)に保存されています。キャラクターの説明を変更することから始められます。
 
-2. Updating spritesheets: in `data/characters.ts`, you will see this code:
+2. スプライトシートの更新: `data/characters.ts`に以下のコードがあります:
 
    ```ts
    export const characters = [
      {
        name: 'f1',
-       textureUrl: '/assets/32x32folk.png',
+       textureUrl: '/ai-town/assets/32x32folk.png',
        spritesheetData: f1SpritesheetData,
        speed: 0.1,
      },
@@ -281,118 +242,100 @@ all of your data.
    ];
    ```
 
-   You should find a sprite sheet for your character, and define sprite motion / assets in the
-   corresponding file (in the above example, `f1SpritesheetData` was defined in f1.ts)
+   キャラクター用のスプライトシートを見つけて、対応するファイルでスプライトのモーション/アセットを定義する必要があります（上記の例では、`f1SpritesheetData`はf1.tsで定義されています）
 
-3. Update the Background (Environment): The map gets loaded in `convex/init.ts` from
-   `data/gentle.js`. To update the map, follow these steps:
+3. 背景（環境）の更新: マップは`convex/init.ts`で`data/gentle.js`からロードされます。マップを更新するには、以下の手順に従います:
 
-   - Use [Tiled](https://www.mapeditor.org/) to export tilemaps as a JSON file (2 layers named
-     bgtiles and objmap)
-   - Use the `convertMap.js` script to convert the JSON to a format that the engine can use.
+   - [Tiled](https://www.mapeditor.org/)を使用してタイルマップをJSONファイルとしてエクスポート（bgtiles と objmap という名前の2つのレイヤー）
+   - `convertMap.js`スクリプトを使用してJSONをエンジンが使用できる形式に変換
 
    ```console
    node data/convertMap.js <mapDataPath> <assetPath> <tilesetpxw> <tilesetpxh>
    ```
 
-   - `<mapDataPath>`: Path to the Tiled JSON file.
-   - `<assetPath>`: Path to tileset images.
-   - `<tilesetpxw>`: Tileset width in pixels.
-   - `<tilesetpxh>`: Tileset height in pixels. Generates `converted-map.js` that you can use like
-     `gentle.js`
+   - `<mapDataPath>`: TiledのJSONファイルへのパス
+   - `<assetPath>`: タイルセット画像へのパス
+   - `<tilesetpxw>`: タイルセットの幅（ピクセル）
+   - `<tilesetpxh>`: タイルセットの高さ（ピクセル）。`gentle.js`のように使用できる`converted-map.js`を生成
 
-4. Adding background music with Replicate (Optional)
+4. Replicateで背景音楽を追加（オプション）
 
-   For Daily background music generation, create a [Replicate](https://replicate.com/) account and
-   create a token in your Profile's [API Token page](https://replicate.com/account/api-tokens).
-   `npx convex env set REPLICATE_API_TOKEN # token`
+   日次の背景音楽生成のために、[Replicate](https://replicate.com/)アカウントを作成し、プロフィールの[API Tokenページ](https://replicate.com/account/api-tokens)でトークンを作成。
+   `npx convex env set REPLICATE_API_TOKEN # トークン`
 
-   This only works if you can receive the webhook from Replicate. If it's running in the normal
-   Convex cloud, it will work by default. If you're self-hosting, you'll need to configure it to hit
-   your app's url on `/http`. If you're using Docker Compose, it will be `http://localhost:3211`,
-   but you'll need to proxy the traffic to your local machine.
+   これはReplicateからwebhookを受信できる場合にのみ機能します。通常のConvexクラウドで実行している場合、デフォルトで機能します。セルフホストしている場合は、アプリのURLの`/http`にヒットするように設定する必要があります。Docker Composeを使用している場合は`http://localhost:3211`になりますが、ローカルマシンへトラフィックをプロキシする必要があります。
 
-   **Note**: The simulation will pause after 5 minutes if the window is idle. Loading the page will
-   unpause it. You can also manually freeze & unfreeze the world with a button in the UI. If you
-   want to run the world without the browser, you can comment-out the "stop inactive worlds" cron in
-   `convex/crons.ts`.
+   **注**: ウィンドウがアイドル状態になると、シミュレーションは5分後に一時停止します。ページをロードすると一時停止が解除されます。UIのボタンでワールドを手動でフリーズ/解除することもできます。ブラウザなしでワールドを実行したい場合は、`convex/crons.ts`の「stop inactive worlds」cronをコメントアウトできます。
 
-   - Change the background music by modifying the prompt in `convex/music.ts`
-   - Change how often to generate new music at `convex/crons.ts` by modifying the
-     `generate new background music` job
+   - `convex/music.ts`のプロンプトを変更して背景音楽を変更
+   - `convex/crons.ts`の`generate new background music`ジョブを変更して新しい音楽を生成する頻度を変更
 
-## Commands to run / test / debug
+## 実行/テスト/デバッグ用コマンド
 
-**To stop the back end, in case of too much activity**
+**アクティビティが多すぎる場合にバックエンドを停止**
 
-This will stop running the engine and agents. You can still run queries and run functions to debug.
+これによりエンジンとエージェントの実行が停止します。クエリの実行や関数の実行でデバッグは引き続き可能です。
 
 ```bash
 npx convex run testing:stop
 ```
 
-**To restart the back end after stopping it**
+**停止後にバックエンドを再起動**
 
 ```bash
 npx convex run testing:resume
 ```
 
-**To kick the engine in case the game engine or agents aren't running**
+**ゲームエンジンやエージェントが実行されていない場合にエンジンをキック**
 
 ```bash
 npx convex run testing:kick
 ```
 
-**To archive the world**
+**ワールドをアーカイブ**
 
-If you'd like to reset the world and start from scratch, you can archive the current world:
+ワールドをリセットして最初からやり直したい場合、現在のワールドをアーカイブできます:
 
 ```bash
 npx convex run testing:archive
 ```
 
-Then, you can still look at the world's data in the dashboard, but the engine and agents will no
-longer run.
+その後、ダッシュボードでワールドのデータを見ることはできますが、エンジンとエージェントは実行されなくなります。
 
-You can then create a fresh world with `init`.
+その後、`init`で新しいワールドを作成できます。
 
 ```bash
 npx convex run init
 ```
 
-**To pause your backend deployment**
+**バックエンドデプロイメントを一時停止**
 
-You can go to the [dashboard](https://dashboard.convex.dev) to your deployment settings to pause and
-un-pause your deployment. This will stop all functions, whether invoked from the client, scheduled,
-or as a cron job. See this as a last resort, as there are gentler ways of stopping above.
+[ダッシュボード](https://dashboard.convex.dev)のデプロイメント設定に移動して、デプロイメントを一時停止/解除できます。これにより、クライアントから呼び出されたか、スケジュールされたか、cronジョブとしての関数がすべて停止します。上記のより穏やかな停止方法があるため、これは最後の手段として使用してください。
 
-## Windows Installation
+## Windowsインストール
 
-### Prerequisites
+### 前提条件
 
-1. **Windows 10/11 with WSL2 installed**
-2. **Internet connection**
+1. **WSL2がインストールされたWindows 10/11**
+2. **インターネット接続**
 
-Steps:
+手順:
 
-1. Install WSL2
+1. WSL2のインストール
 
-   First, you need to install WSL2. Follow
-   [this guide](https://docs.microsoft.com/en-us/windows/wsl/install) to set up WSL2 on your Windows
-   machine. We recommend using Ubuntu as your Linux distribution.
+   まず、WSL2をインストールする必要があります。[このガイド](https://docs.microsoft.com/en-us/windows/wsl/install)に従ってWindowsマシンにWSL2をセットアップしてください。LinuxディストリビューションとしてUbuntuを推奨します。
 
-2. Update Packages
+2. パッケージの更新
 
-   Open your WSL terminal (Ubuntu) and update your packages:
+   WSLターミナル（Ubuntu）を開いてパッケージを更新:
 
    ```sh
    sudo apt update
    ```
 
-3. Install NVM and Node.js
+3. NVMとNode.jsのインストール
 
-   NVM (Node Version Manager) helps manage multiple versions of Node.js. Install NVM and Node.js 18
-   (the stable version):
+   NVM（Node Version Manager）は複数のNode.jsバージョンを管理するのに役立ちます。NVMとNode.js 18（安定版）をインストール:
 
    ```sh
    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
@@ -403,207 +346,182 @@ Steps:
    nvm use 18
    ```
 
-4. Install Python and Pip
+4. PythonとPipのインストール
 
-   Python is required for some dependencies. Install Python and Pip:
+   一部の依存関係にはPythonが必要です。PythonとPipをインストール:
 
    ```sh
    sudo apt-get install python3 python3-pip sudo ln -s /usr/bin/python3 /usr/bin/python
    ```
 
-At this point, you can follow the instructions [above](#installation).
+この時点で、[上記](#インストール)の手順に従えます。
 
-## Deploy the app to production
+## アプリを本番環境にデプロイ
 
-### Deploy Convex functions to prod environment
+### Convex関数を本番環境にデプロイ
 
-Before you can run the app, you will need to make sure the Convex functions are deployed to its
-production environment. Note: this is assuming you're using the default Convex cloud product.
+アプリを実行する前に、Convex関数を本番環境にデプロイする必要があります。注: これはデフォルトのConvexクラウド製品を使用していることを前提としています。
 
-1. Run `npx convex deploy` to deploy the convex functions to production
-2. Run `npx convex run init --prod`
+1. `npx convex deploy`を実行してconvex関数を本番にデプロイ
+2. `npx convex run init --prod`を実行
 
-To transfer your local data to the cloud, you can run `npx convex export` and then import it with
-`npx convex import --prod`.
+ローカルデータをクラウドに転送するには、`npx convex export`を実行してから`npx convex import --prod`でインポートできます。
 
-If you have existing data you want to clear, you can run
-`npx convex run testing:wipeAllTables --prod`
+クリアしたい既存データがある場合は、`npx convex run testing:wipeAllTables --prod`を実行できます。
 
-### Adding Auth (Optional)
+### 認証の追加（オプション）
 
-You can add clerk auth back in with `git revert b44a436`. Or just look at that diff for what changed
-to remove it.
+`git revert b44a436`でclerk認証を戻すことができます。または、そのdiffを見て何が変更されたかを確認するだけでもできます。
 
-**Make a Clerk account**
+**Clerkアカウントを作成**
 
-- Go to https://dashboard.clerk.com/ and click on "Add Application"
-- Name your application and select the sign-in providers you would like to offer users
+- https://dashboard.clerk.com/ に移動して「Add Application」をクリック
+- アプリケーションに名前を付けて、ユーザーに提供するサインインプロバイダーを選択
 - Create Application
-- Add `VITE_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` to `.env.local`
+- `.env.local`に`VITE_CLERK_PUBLISHABLE_KEY`と`CLERK_SECRET_KEY`を追加
 
 ```bash
 VITE_CLERK_PUBLISHABLE_KEY=pk_***
 CLERK_SECRET_KEY=sk_***
 ```
 
-- Go to JWT Templates and create a new Convex Template.
-- Copy the JWKS endpoint URL for use below.
+- JWT Templatesに移動して新しいConvex Templateを作成
+- 以下で使用するJWKSエンドポイントURLをコピー
 
 ```sh
-npx convex env set CLERK_ISSUER_URL # e.g. https://your-issuer-url.clerk.accounts.dev/
+npx convex env set CLERK_ISSUER_URL # 例: https://your-issuer-url.clerk.accounts.dev/
 ```
 
-### Deploy the frontend to Vercel
+### フロントエンドをVercelにデプロイ
 
-- Register an account on Vercel and then [install the Vercel CLI](https://vercel.com/docs/cli).
-- **If you are using Github Codespaces**: You will need to
-  [install the Vercel CLI](https://vercel.com/docs/cli) and authenticate from your codespaces cli by
-  running `vercel login`.
-- Deploy the app to Vercel with `vercel --prod`.
+- Vercelでアカウントを登録してから[Vercel CLIをインストール](https://vercel.com/docs/cli)
+- **Github Codespacesを使用している場合**: codespaces cliから`vercel login`を実行して[Vercel CLIをインストール](https://vercel.com/docs/cli)して認証する必要があります
+- `vercel --prod`でアプリをVercelにデプロイ
 
-## Using local inference from a cloud deployment
+## クラウドデプロイからローカル推論を使用する
 
-We support using [Ollama](https://github.com/jmorganca/ollama) for conversation generations. To have
-it accessible from the web, you can use Tunnelmole or Ngrok or similar so the cloud backend can send
-requests to Ollama running on your local machine.
+会話生成に[Ollama](https://github.com/jmorganca/ollama)を使用することをサポートしています。Webからアクセス可能にするには、TunnelmoleやNgrokなどを使用して、クラウドバックエンドがローカルマシンで実行されているOllamaにリクエストを送信できるようにします。
 
-Steps:
+手順:
 
-1. Set up either Tunnelmole or Ngrok.
-2. Add Ollama endpoint to Convex
+1. TunnelmoleまたはNgrokをセットアップ
+2. OllamaエンドポイントをConvexに追加
    ```sh
-   npx convex env set OLLAMA_HOST # your tunnelmole/ngrok unique url from the previous step
+   npx convex env set OLLAMA_HOST # 前のステップからのtunnelmole/ngrokユニークURL
    ```
-3. Update Ollama domains Ollama has a list of accepted domains. Add the ngrok domain so it won't
-   reject traffic. see [ollama.ai](https://ollama.ai) for more details.
+3. Ollamaドメインを更新。Ollamaには許可されたドメインのリストがあります。ngrokドメインを追加してトラフィックが拒否されないようにします。詳細は[ollama.ai](https://ollama.ai)を参照。
 
-### Using Tunnelmole
+### Tunnelmoleを使用
 
-[Tunnelmole](https://github.com/robbie-cahill/tunnelmole-client) is an open source tunneling tool.
+[Tunnelmole](https://github.com/robbie-cahill/tunnelmole-client)はオープンソースのトンネリングツールです。
 
-You can install Tunnelmole using one of the following options:
+以下のオプションのいずれかを使用してTunnelmoleをインストールできます:
 
 - NPM: `npm install -g tunnelmole`
 - Linux: `curl -s https://tunnelmole.com/sh/install-linux.sh | sudo bash`
 - Mac:
   `curl -s https://tunnelmole.com/sh/install-mac.sh --output install-mac.sh && sudo bash install-mac.sh`
-- Windows: Install with NPM, or if you don't have NodeJS installed, download the `exe` file for
-  Windows [here](https://tunnelmole.com/downloads/tmole.exe) and put it somewhere in your PATH.
+- Windows: NPMでインストールするか、NodeJSがインストールされていない場合は、[こちら](https://tunnelmole.com/downloads/tmole.exe)からWindows用の`exe`ファイルをダウンロードしてPATHのどこかに置く
 
-Once Tunnelmole is installed, run the following command:
+Tunnelmoleをインストールしたら、以下のコマンドを実行:
 
 ```
 tmole 11434
 ```
 
-Tunnelmole should output a unique url once you run this command.
+このコマンドを実行するとTunnelmoleはユニークなURLを出力します。
 
-### Using Ngrok
+### Ngrokを使用
 
-Ngrok is a popular closed source tunneling tool.
+Ngrokは人気のあるクローズドソーストンネリングツールです。
 
-- [Install Ngrok](https://ngrok.com/docs/getting-started/)
+- [Ngrokをインストール](https://ngrok.com/docs/getting-started/)
 
-Once ngrok is installed and authenticated, run the following command:
+ngrokをインストールして認証したら、以下のコマンドを実行:
 
 ```
 ngrok http http://localhost:11434
 ```
 
-Ngrok should output a unique url once you run this command.
+このコマンドを実行するとNgrokはユニークなURLを出力します。
 
-## Troubleshooting
+## トラブルシューティング
 
-### Wiping the database and starting over
+### データベースをワイプして最初からやり直す
 
-You can wipe the database by running:
+以下を実行してデータベースをワイプできます:
 
 ```sh
 npx convex run testing:wipeAllTables
 ```
 
-Then reset with:
+その後、以下でリセット:
 
 ```sh
 npx convex run init
 ```
 
-### Incompatible Node.js versions
+### 互換性のないNode.jsバージョン
 
-If you encounter a node version error on the convex server upon application startup, please use node
-version 18, which is the most stable. One way to do this is by
-[installing nvm](https://nodejs.org/en/download/package-manager) and running `nvm install 18` and
-`nvm use 18`.
+アプリケーション起動時にconvexサーバーでnodeバージョンエラーが発生した場合、最も安定しているnode version 18を使用してください。方法の1つは[nvmをインストール](https://nodejs.org/en/download/package-manager)して`nvm install 18`と`nvm use 18`を実行することです。
 
-### Reaching Ollama
+### Ollamaへの接続
 
-If you're having trouble with the backend communicating with Ollama, it depends on your setup how to
-debug:
+バックエンドがOllamaと通信できない問題がある場合、セットアップによってデバッグ方法が異なります:
 
-1. If you're running directly on Windows, see
-   [Windows Ollama connection issues](#windows-ollama-connection-issues).
-2. If you're using **Docker**, see
-   [Docker to Ollama connection issues](#docker-to-ollama-connection-issues).
-3. If you're running locally, you can try the following:
+1. Windows上で直接実行している場合は、[Windows Ollama接続の問題](#windows-ollama接続の問題)を参照
+2. **Docker**を使用している場合は、[DockerからOllamaへの接続の問題](#dockerからollamaへの接続の問題)を参照
+3. ローカルで実行している場合、以下を試せます:
 
 ```sh
 npx convex env set OLLAMA_HOST http://localhost:11434
 ```
 
-By default, the host is set to `http://127.0.0.1:11434`. Some systems prefer `localhost`
-¯\_(ツ)\_/¯.
+デフォルトではホストは`http://127.0.0.1:11434`に設定されています。一部のシステムは`localhost`を好みます ¯\_(ツ)\_/¯
 
-### Windows Ollama connection issues
+### Windows Ollama接続の問題
 
-If the above didn't work after following the [windows](#windows-installation) and regular
-[installation](#installation) instructions, you can try the following, assuming you're **not** using
-Docker.
+[Windows](#windowsインストール)と通常の[インストール](#インストール)手順に従った後、上記がうまくいかない場合、Dockerを使用して**いない**ことを前提に、以下を試せます。
 
-If you're using Docker, see the [next section](#docker-to-ollama-connection-issues) for Docker
-troubleshooting.
+Dockerを使用している場合は、[次のセクション](#dockerからollamaへの接続の問題)を参照してください。
 
-For running directly on Windows, you can try the following:
+Windows上で直接実行する場合、以下を試せます:
 
-1. Install `unzip` and `socat`:
+1. `unzip`と`socat`をインストール:
 
    ```sh
    sudo apt install unzip socat
    ```
 
-2. Configure `socat` to Bridge Ports for Ollama
+2. Ollama用にポートをブリッジするために`socat`を設定
 
-   Run the following command to bridge ports:
+   以下のコマンドを実行してポートをブリッジ:
 
    ```sh
    socat TCP-LISTEN:11434,fork TCP:$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):11434 &
    ```
 
-3. Test if it's working:
+3. 動作しているかテスト:
 
    ```sh
    curl http://127.0.0.1:11434
    ```
 
-   If it responds OK, the Ollama API should be accessible.
+   OKと応答すれば、Ollama APIにアクセス可能です。
 
-### Docker to Ollama connection issues
+### DockerからOllamaへの接続の問題
 
-If you're having trouble with the backend communicating with Ollama, there's a couple things to
-check:
+バックエンドがOllamaと通信できない問題がある場合、いくつか確認することがあります:
 
-1. Is Docker at least verion 18.03 ? That allows you to use the `host.docker.internal` hostname to
-   connect to the host from inside the container.
+1. Dockerは少なくともバージョン18.03ですか？これにより、`host.docker.internal`ホスト名を使用してコンテナ内からホストに接続できます。
 
-2. Is Ollama running? You can check this by running `curl http://localhost:11434` from outside the
-   container.
+2. Ollamaは実行していますか？コンテナの外から`curl http://localhost:11434`を実行して確認できます。
 
-3. Is Ollama accessible from inside the container? You can check this by running
-   `docker compose exec backend curl http://host.docker.internal:11434`.
+3. Ollamaはコンテナ内からアクセス可能ですか？`docker compose exec backend curl http://host.docker.internal:11434`を実行して確認できます。
 
-If 1 & 2 work, but 3 does not, you can use `socat` to bridge the traffic from inside the container
-to Ollama running on the host.
+1と2が動作するが3が動作しない場合、`socat`を使用してコンテナ内からホストで実行されているOllamaへトラフィックをブリッジできます。
 
-1. Configure `socat` with the host's IP address (not the Docker IP).
+1. ホストのIPアドレス（Docker IPではなく）で`socat`を設定
 
    ```sh
    docker compose exec backend /bin/bash
@@ -611,100 +529,52 @@ to Ollama running on the host.
    socat TCP-LISTEN:11434,fork TCP:$HOST_IP:11434
    ```
 
-   Keep this running.
+   これを実行し続けます。
 
-2. Then from outside of the container:
+2. その後、コンテナの外から:
 
    ```sh
    npx convex env set OLLAMA_HOST http://localhost:11434
    ```
 
-3. Test if it's working:
+3. 動作しているかテスト:
 
    ```sh
    docker compose exec backend curl http://localhost:11434
    ```
 
-   If it responds OK, the Ollama API is accessible. Otherwise, try changing the previous two to
-   `http://127.0.0.1:11434`.
+   OKと応答すれば、Ollama APIにアクセス可能です。そうでなければ、前の2つを`http://127.0.0.1:11434`に変更してみてください。
 
-### Launching an Interactive Docker Terminal
+### インタラクティブDockerターミナルの起動
 
-If you wan to investigate inside the container, you can launch an interactive Docker terminal, for
-the `frontend`, `backend` or `dashboard` service:
+コンテナ内を調査したい場合、`frontend`、`backend`、`dashboard`サービス用にインタラクティブDockerターミナルを起動できます:
 
 ```bash
 docker compose exec frontend /bin/bash
 ```
 
-To exit the container, run `exit`.
+コンテナを終了するには、`exit`を実行します。
 
-### Updating the browser list
+### ブラウザリストの更新
 
 ```bash
 docker compose exec frontend npx update-browserslist-db@latest
 ```
 
-# 🧑‍🏫 What is Convex?
+# 🧑‍🏫 Convexとは？
 
-[Convex](https://convex.dev) is a hosted backend platform with a built-in database that lets you
-write your [database schema](https://docs.convex.dev/database/schemas) and
-[server functions](https://docs.convex.dev/functions) in
-[TypeScript](https://docs.convex.dev/typescript). Server-side database
-[queries](https://docs.convex.dev/functions/query-functions) automatically
-[cache](https://docs.convex.dev/functions/query-functions#caching--reactivity) and
-[subscribe](https://docs.convex.dev/client/react#reactivity) to data, powering a
-[realtime `useQuery` hook](https://docs.convex.dev/client/react#fetching-data) in our
-[React client](https://docs.convex.dev/client/react). There are also clients for
-[Python](https://docs.convex.dev/client/python), [Rust](https://docs.convex.dev/client/rust),
-[ReactNative](https://docs.convex.dev/client/react-native), and
-[Node](https://docs.convex.dev/client/javascript), as well as a straightforward
-[HTTP API](https://docs.convex.dev/http-api/).
+[Convex](https://convex.dev)は、[TypeScript](https://docs.convex.dev/typescript)で[データベーススキーマ](https://docs.convex.dev/database/schemas)と[サーバー関数](https://docs.convex.dev/functions)を書けるビルトインデータベースを持つホスト型バックエンドプラットフォームです。サーバーサイドのデータベース[クエリ](https://docs.convex.dev/functions/query-functions)は自動的にデータを[キャッシュ](https://docs.convex.dev/functions/query-functions#caching--reactivity)して[サブスクライブ](https://docs.convex.dev/client/react#reactivity)し、[Reactクライアント](https://docs.convex.dev/client/react)の[リアルタイム`useQuery`フック](https://docs.convex.dev/client/react#fetching-data)を動かします。[Python](https://docs.convex.dev/client/python)、[Rust](https://docs.convex.dev/client/rust)、[ReactNative](https://docs.convex.dev/client/react-native)、[Node](https://docs.convex.dev/client/javascript)用のクライアントもあり、簡単な[HTTP API](https://docs.convex.dev/http-api/)もあります。
 
-The database supports [NoSQL-style documents](https://docs.convex.dev/database/document-storage)
-with [opt-in schema validation](https://docs.convex.dev/database/schemas),
-[relationships](https://docs.convex.dev/database/document-ids) and
-[custom indexes](https://docs.convex.dev/database/indexes/) (including on fields in nested objects).
+データベースは[NoSQLスタイルのドキュメント](https://docs.convex.dev/database/document-storage)をサポートし、[オプトインスキーマ検証](https://docs.convex.dev/database/schemas)、[リレーションシップ](https://docs.convex.dev/database/document-ids)、[カスタムインデックス](https://docs.convex.dev/database/indexes/)（ネストされたオブジェクトのフィールドを含む）があります。
 
-The [`query`](https://docs.convex.dev/functions/query-functions) and
-[`mutation`](https://docs.convex.dev/functions/mutation-functions) server functions have
-transactional, low latency access to the database and leverage our
-[`v8` runtime](https://docs.convex.dev/functions/runtimes) with
-[determinism guardrails](https://docs.convex.dev/functions/runtimes#using-randomness-and-time-in-queries-and-mutations)
-to provide the strongest ACID guarantees on the market: immediate consistency, serializable
-isolation, and automatic conflict resolution via
-[optimistic multi-version concurrency control](https://docs.convex.dev/database/advanced/occ) (OCC /
-MVCC).
+[`query`](https://docs.convex.dev/functions/query-functions)と[`mutation`](https://docs.convex.dev/functions/mutation-functions)サーバー関数は、データベースへのトランザクショナルで低遅延のアクセスを持ち、[決定性ガードレール](https://docs.convex.dev/functions/runtimes#using-randomness-and-time-in-queries-and-mutations)を持つ[`v8`ランタイム](https://docs.convex.dev/functions/runtimes)を活用して、市場で最強のACID保証を提供します：即時一貫性、直列化可能分離、[楽観的マルチバージョン同時実行制御](https://docs.convex.dev/database/advanced/occ)（OCC / MVCC）による自動競合解決。
 
-The [`action` server functions](https://docs.convex.dev/functions/actions) have access to external
-APIs and enable other side-effects and non-determinism in either our
-[optimized `v8` runtime](https://docs.convex.dev/functions/runtimes) or a more
-[flexible `node` runtime](https://docs.convex.dev/functions/runtimes#nodejs-runtime).
+[`action`サーバー関数](https://docs.convex.dev/functions/actions)は外部APIにアクセスでき、[最適化された`v8`ランタイム](https://docs.convex.dev/functions/runtimes)または[より柔軟な`node`ランタイム](https://docs.convex.dev/functions/runtimes#nodejs-runtime)で他の副作用と非決定性を可能にします。
 
-Functions can run in the background via
-[scheduling](https://docs.convex.dev/scheduling/scheduled-functions) and
-[cron jobs](https://docs.convex.dev/scheduling/cron-jobs).
+関数は[スケジューリング](https://docs.convex.dev/scheduling/scheduled-functions)と[cronジョブ](https://docs.convex.dev/scheduling/cron-jobs)を介してバックグラウンドで実行できます。
 
-Development is cloud-first, with
-[hot reloads for server function](https://docs.convex.dev/cli#run-the-convex-dev-server) editing via
-the [CLI](https://docs.convex.dev/cli),
-[preview deployments](https://docs.convex.dev/production/hosting/preview-deployments),
-[logging and exception reporting integrations](https://docs.convex.dev/production/integrations/),
-There is a [dashboard UI](https://docs.convex.dev/dashboard) to
-[browse and edit data](https://docs.convex.dev/dashboard/deployments/data),
-[edit environment variables](https://docs.convex.dev/production/environment-variables),
-[view logs](https://docs.convex.dev/dashboard/deployments/logs),
-[run server functions](https://docs.convex.dev/dashboard/deployments/functions), and more.
+開発はクラウドファーストで、[CLI](https://docs.convex.dev/cli)による[サーバー関数編集のホットリロード](https://docs.convex.dev/cli#run-the-convex-dev-server)、[プレビューデプロイメント](https://docs.convex.dev/production/hosting/preview-deployments)、[ロギングと例外報告の統合](https://docs.convex.dev/production/integrations/)があります。[データを閲覧・編集](https://docs.convex.dev/dashboard/deployments/data)、[環境変数を編集](https://docs.convex.dev/production/environment-variables)、[ログを見る](https://docs.convex.dev/dashboard/deployments/logs)、[サーバー関数を実行](https://docs.convex.dev/dashboard/deployments/functions)などができる[ダッシュボードUI](https://docs.convex.dev/dashboard)があります。
 
-There are built-in features for [reactive pagination](https://docs.convex.dev/database/pagination),
-[file storage](https://docs.convex.dev/file-storage),
-[reactive text search](https://docs.convex.dev/text-search),
-[vector search](https://docs.convex.dev/vector-search),
-[https endpoints](https://docs.convex.dev/functions/http-actions) (for webhooks),
-[snapshot import/export](https://docs.convex.dev/database/import-export/),
-[streaming import/export](https://docs.convex.dev/production/integrations/streaming-import-export),
-and [runtime validation](https://docs.convex.dev/database/schemas#validators) for
-[function arguments](https://docs.convex.dev/functions/args-validation) and
-[database data](https://docs.convex.dev/database/schemas#schema-validation).
+[リアクティブページネーション](https://docs.convex.dev/database/pagination)、[ファイルストレージ](https://docs.convex.dev/file-storage)、[リアクティブテキスト検索](https://docs.convex.dev/text-search)、[ベクトル検索](https://docs.convex.dev/vector-search)、[httpsエンドポイント](https://docs.convex.dev/functions/http-actions)（webhooks用）、[スナップショットインポート/エクスポート](https://docs.convex.dev/database/import-export/)、[ストリーミングインポート/エクスポート](https://docs.convex.dev/production/integrations/streaming-import-export)、[関数引数](https://docs.convex.dev/functions/args-validation)と[データベースデータ](https://docs.convex.dev/database/schemas#schema-validation)の[ランタイム検証](https://docs.convex.dev/database/schemas#validators)用のビルトイン機能があります。
 
-Everything scales automatically, and it’s [free to start](https://www.convex.dev/plans).
+すべてが自動的にスケールし、[無料で始められます](https://www.convex.dev/plans)。
