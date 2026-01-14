@@ -4,9 +4,15 @@ const OPENAI_EMBEDDING_DIMENSION = 1536;
 const TOGETHER_EMBEDDING_DIMENSION = 768;
 const OLLAMA_EMBEDDING_DIMENSION = 1024;
 
-export const EMBEDDING_DIMENSION: number = OLLAMA_EMBEDDING_DIMENSION;
+// LM Studio with nomic-embed-text-v1.5 (768 dimensions)
+export const EMBEDDING_DIMENSION: number = 768;
 
 export function detectMismatchedLLMProvider() {
+  // Skip detection if using custom LLM (e.g., LM Studio)
+  if (process.env.LLM_API_URL) {
+    return;
+  }
+
   switch (EMBEDDING_DIMENSION) {
     case OPENAI_EMBEDDING_DIMENSION:
       if (!process.env.OPENAI_API_KEY) {
