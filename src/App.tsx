@@ -14,6 +14,7 @@ import MusicButton from './components/buttons/MusicButton.tsx';
 import Button from './components/buttons/Button.tsx';
 import InteractButton from './components/buttons/InteractButton.tsx';
 import FreezeButton from './components/FreezeButton.tsx';
+import { resetViewport } from './components/PixiViewport.tsx';
 import { MAX_HUMAN_PLAYERS } from '../convex/constants.ts';
 import PoweredByConvex from './components/PoweredByConvex.tsx';
 
@@ -70,8 +71,8 @@ export default function Home() {
       <div className="w-full h-full relative isolate overflow-hidden flex flex-col">
         <Game />
 
-        <footer className="absolute bottom-0 left-0 w-full flex items-center gap-3 p-4 flex-wrap pointer-events-none z-10">
-          <div className="flex gap-4 flex-grow pointer-events-none">
+        <footer className="fixed bottom-0 left-0 w-full p-2 lg:p-4 z-20 overflow-x-auto pointer-events-auto">
+          <div className="flex gap-2 lg:gap-4 w-max">
             <FreezeButton />
             <MusicButton />
             <Button href="https://github.com/a16z-infra/ai-town" imgUrl={starImg}>
@@ -80,6 +81,9 @@ export default function Home() {
             <InteractButton />
             <Button imgUrl={helpImg} onClick={() => setHelpModalOpen(true)}>
               ヘルプ
+            </Button>
+            <Button imgUrl={helpImg} onClick={() => resetViewport()}>
+              リセット
             </Button>
           </div>
         </footer>

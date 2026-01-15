@@ -76,6 +76,8 @@ export class Agent {
     // If we have been wandering but haven't thought about something to do for
     // a while, do something.
     if (!conversation && !doingActivity && (!player.pathfinding || !recentlyAttemptedInvite)) {
+      const agentDescription = game.agentDescriptions.get(this.id);
+      const isNPC = agentDescription?.isNPC ?? false;
       this.startOperation(game, now, 'agentDoSomething', {
         worldId: game.worldId,
         player: player.serialize(),
@@ -87,6 +89,7 @@ export class Agent {
           .map((p) => p.serialize()),
         agent: this.serialize(),
         map: game.worldMap.serialize(),
+        isNPC,
       });
       return;
     }
@@ -339,12 +342,49 @@ export const findConversationCandidate = internalQuery({
     worldId: v.id('worlds'),
     player: v.object(serializedPlayer),
     otherFreePlayers: v.array(v.object(serializedPlayer)),
+    currentAgentIsNPC: v.optional(v.boolean()),
   },
-  handler: async (ctx, { now, worldId, player, otherFreePlayers }) => {
+  handler: async (ctx, { now, worldId, player, otherFreePlayers, currentAgentIsNPC }) => {
     const { position } = player;
     const candidates = [];
 
+    // If current agent is NPC, we need to check other players' NPC status
+    let otherPlayerNPCStatus: Map<string, boolean> | null = null;
+    if (currentAgentIsNPC) {
+      // Get world data to map playerId -> agentId
+      const world = await ctx.db.get(worldId);
+      const playerToAgent = new Map<string, string>();
+      if (world?.agents) {
+        for (const agent of world.agents) {
+          playerToAgent.set(agent.playerId, agent.id);
+        }
+      }
+
+      // Get agent descriptions to check isNPC
+      const agentDescriptions = await ctx.db
+        .query('agentDescriptions')
+        .withIndex('worldId', (q) => q.eq('worldId', worldId))
+        .collect();
+
+      otherPlayerNPCStatus = new Map();
+      for (const otherPlayer of otherFreePlayers) {
+        const agentId = playerToAgent.get(otherPlayer.id);
+        if (agentId) {
+          const desc = agentDescriptions.find((d) => d.agentId === agentId);
+          otherPlayerNPCStatus.set(otherPlayer.id, desc?.isNPC ?? false);
+        } else {
+          // No agent means it's a human player (not NPC)
+          otherPlayerNPCStatus.set(otherPlayer.id, false);
+        }
+      }
+    }
+
     for (const otherPlayer of otherFreePlayers) {
+      // Skip if both are NPCs (NPC->NPC conversation not allowed)
+      if (currentAgentIsNPC && otherPlayerNPCStatus?.get(otherPlayer.id)) {
+        continue;
+      }
+
       // Find the latest conversation we're both members of.
       const lastMember = await ctx.db
         .query('participatedTogether')

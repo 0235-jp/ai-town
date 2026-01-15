@@ -6,15 +6,16 @@ import { ConvexReactClient, ConvexProvider } from 'convex/react';
 /**
  * Determines the Convex deployment to use.
  *
- * We perform load balancing on the frontend, by randomly selecting one of the available instances.
- * We use localStorage so that individual users stay on the same instance.
+ * Uses the same hostname as the current page to support both local and external access.
  */
 function convexUrl(): string {
-  const url = import.meta.env.VITE_CONVEX_URL as string;
-  if (!url) {
-    throw new Error('Couldn’t find the Convex deployment URL.');
+  // Use environment variable if set, otherwise derive from current hostname
+  const envUrl = import.meta.env.VITE_CONVEX_URL as string;
+  if (envUrl && !envUrl.includes('127.0.0.1')) {
+    return envUrl;
   }
-  return url;
+  // For self-hosted: use same hostname as current page with Convex port
+  return `http://${window.location.hostname}:3210`;
 }
 
 const convex = new ConvexReactClient(convexUrl(), { unsavedChangesWarning: false });

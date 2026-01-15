@@ -98,6 +98,7 @@ export const agentDoSomething = internalAction({
     map: v.object(serializedWorldMap),
     otherFreePlayers: v.array(v.object(serializedPlayer)),
     operationId: v.string(),
+    isNPC: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const { player, agent } = args;
@@ -152,6 +153,7 @@ export const agentDoSomething = internalAction({
             worldId: args.worldId,
             player: args.player,
             otherFreePlayers: args.otherFreePlayers,
+            currentAgentIsNPC: args.isNPC,
           });
 
     // TODO: We hit a lot of OCC errors on sending inputs in this file. It's

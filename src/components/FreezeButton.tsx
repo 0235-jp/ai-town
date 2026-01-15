@@ -25,7 +25,7 @@ export default function FreezeButton() {
     <>
       <Button
         onClick={flipSwitch}
-        className="hidden lg:block"
+        className=""
         title="ワールドを一時停止すると、エージェントは現在の動作を完了してから停止します。"
         imgUrl="/assets/star.svg"
       >

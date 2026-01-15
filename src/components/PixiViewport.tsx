@@ -4,7 +4,16 @@
 import { PixiComponent, useApp } from '@pixi/react';
 import { Viewport } from 'pixi-viewport';
 import { Application } from 'pixi.js';
-import { MutableRefObject, ReactNode } from 'react';
+import { MutableRefObject, ReactNode, useEffect } from 'react';
+
+// Global reference for reset functionality
+let viewportInstance: Viewport | null = null;
+
+export function resetViewport() {
+  if (viewportInstance) {
+    viewportInstance.fitWorld(true);
+  }
+}
 
 export type ViewportProps = {
   app: Application;
@@ -30,6 +39,8 @@ export default PixiComponent('Viewport', {
     if (viewportRef) {
       viewportRef.current = viewport;
     }
+    // Store global reference for reset functionality
+    viewportInstance = viewport;
     // Activate plugins
     viewport
       .drag()
@@ -37,11 +48,11 @@ export default PixiComponent('Viewport', {
       .wheel()
       .decelerate()
       .clamp({ direction: 'all', underflow: 'center' })
-      .setZoom(-10)
       .clampZoom({
-        minScale: (1.04 * props.screenWidth) / (props.worldWidth / 2),
+        minScale: 0.3,
         maxScale: 3.0,
-      });
+      })
+      .fitWorld(true);  // Auto-fit map to screen
     return viewport;
   },
   applyProps(viewport, oldProps: any, newProps: any) {

@@ -6,6 +6,7 @@ export default defineConfig({
   base: '/ai-town',
   plugins: [react()],
   server: {
-    allowedHosts: ['ai-town-your-app-name.fly.dev', 'localhost', '127.0.0.1'],
+    host: true, // Listen on all addresses (0.0.0.0) for LAN access
+    allowedHosts: true, // Allow all hosts
   },
 });
