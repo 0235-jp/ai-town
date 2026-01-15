@@ -17,8 +17,9 @@ import { chatCompletion } from './util/llm';
 import { startConversationMessage } from './agent/conversation';
 import { GameId } from './aiTown/ids';
 
-// Clear all of the tables except for the embeddings cache.
-const excludedTables: Array<TableNames> = ['embeddingsCache'];
+// Clear all of the tables.
+// Note: embeddingsCache も含めて全削除（エンベディング次元変更時に必要）
+const excludedTables: Array<TableNames> = [];
 
 export const wipeAllTables = internalMutation({
   handler: async (ctx) => {
