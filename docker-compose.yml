@@ -1,23 +1,9 @@
-version: '3.8'
-
 services:
-  frontend:
-    build: .
-    ports:
-      - '5176:5173'
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    environment:
-      - VITE_CONVEX_URL=http://127.0.0.1:${PORT:-3210}
-    networks:
-      - ai-town-network
   backend:
     image: ghcr.io/get-convex/convex-backend:latest
     ports:
       - '${PORT:-3210}:3210'
       - '${SITE_PROXY_PORT:-3211}:3211'
-      - '${OLLAMA_PORT:-11434}:11434'
     volumes:
       - data:/convex/data
     environment:
@@ -31,9 +17,9 @@ services:
     healthcheck:
       test: curl -f http://localhost:3210/version
       interval: 5s
-      start_period: 5s
-    networks:
-      - ai-town-network
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   dashboard:
     image: ghcr.io/get-convex/convex-dashboard:latest
@@ -47,7 +33,3 @@ services:
 
 volumes:
   data:
-
-networks:
-  ai-town-network:
-    driver: bridge

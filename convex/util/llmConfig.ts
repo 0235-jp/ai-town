@@ -1,41 +1,54 @@
 // LLM設定ファイル
 // プロバイダーを変更する場合は、使用したい設定のコメントを外してください
 
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import type { LanguageModelV1, EmbeddingModelV1 } from 'ai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createOpenAI } from '@ai-sdk/openai';
+import type { LanguageModel, EmbeddingModel } from 'ai';
 
 // =============================================================================
 // エンベディング次元数（スキーマ評価時に必要なため、ここで定義）
 // =============================================================================
-export const EMBEDDING_DIMENSION = 768;
+export const EMBEDDING_DIMENSION = 3072;
+
+// =============================================================================
+// チャット設定
+// =============================================================================
+export const CHAT_CONFIG = {
+  // 最大出力トークン数（undefinedで制限なし）
+  maxOutputTokens: undefined,
+
+  // リーズニング設定
+  reasoning: {
+    // Claude extended thinking: undefinedで無効、数値でbudgetTokensを指定
+    anthropicBudgetTokens: undefined,
+
+    // OpenAI o1/o3系: 'low' | 'medium' | 'high' | undefined
+    openaiEffort: 'low',
+  },
+};
 
 // =============================================================================
 // モデル初期化（遅延評価 - 実行時のみ）
 // =============================================================================
-let _chatModel: LanguageModelV1 | null = null;
-let _embeddingModel: EmbeddingModelV1<string> | null = null;
+let _chatModel: LanguageModel | null = null;
+let _embeddingModel: EmbeddingModel | null = null;
 
 function initModels() {
   if (_chatModel && _embeddingModel) return;
 
-  // LM Studio（デフォルト）
-  const lmstudio = createOpenAICompatible({
-    name: 'lmstudio',
-    baseURL: process.env.LLM_API_URL || 'http://localhost:1234/v1',
-  });
+  const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  _chatModel = openai('gpt-5-mini-2025-08-07');
 
-  _chatModel = lmstudio(process.env.LLM_MODEL || 'llama-3.2-3b-instruct');
-  _embeddingModel = lmstudio.embeddingModel(
-    process.env.LLM_EMBEDDING_MODEL || 'nomic-embed-text-v1.5',
-  );
+  const google = createGoogleGenerativeAI({ apiKey: process.env.GOOGLE_API_KEY });
+  _embeddingModel = google.embeddingModel('gemini-embedding-001');
 }
 
-export function getChatModel(): LanguageModelV1 {
+export function getChatModel(): LanguageModel {
   initModels();
   return _chatModel!;
 }
 
-export function getEmbeddingModel(): EmbeddingModelV1<string> {
+export function getEmbeddingModel(): EmbeddingModel {
   initModels();
   return _embeddingModel!;
 }
@@ -65,7 +78,7 @@ export function getEmbeddingModel(): EmbeddingModelV1<string> {
 // import { createGoogleGenerativeAI } from '@ai-sdk/google';
 // const google = createGoogleGenerativeAI({ apiKey: process.env.GOOGLE_API_KEY });
 // _chatModel = google('gemini-2.0-flash');
-// _embeddingModel = google.textEmbeddingModel('text-embedding-004');
+// _embeddingModel = google.embeddingModel('text-embedding-004');
 // EMBEDDING_DIMENSION = 768;
 //
 // --- Ollama ---

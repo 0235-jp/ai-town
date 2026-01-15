@@ -63,7 +63,6 @@ export async function startConversationMessage(
         content: prompt.join('\n'),
       },
     ],
-    max_tokens: 300,
     stop: stopWords(otherPlayer.name, player.name),
   });
   return trimContentPrefx(content, lastPrompt);
@@ -129,7 +128,6 @@ export async function continueConversationMessage(
 
   const { content } = await chatCompletion({
     messages: llmMessages,
-    max_tokens: 300,
     stop: stopWords(otherPlayer.name, player.name),
   });
   return trimContentPrefx(content, lastPrompt);
@@ -179,7 +177,6 @@ export async function leaveConversationMessage(
 
   const { content } = await chatCompletion({
     messages: llmMessages,
-    max_tokens: 300,
     stop: stopWords(otherPlayer.name, player.name),
   });
   return trimContentPrefx(content, lastPrompt);

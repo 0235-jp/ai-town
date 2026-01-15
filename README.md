@@ -25,10 +25,15 @@ AI Townは、AIキャラクターが生活し、チャットし、交流する�
 ## 技術スタック
 
 - ゲームエンジン、データベース、ベクトル検索: [Convex](https://convex.dev/)
+- LLM統合: [Vercel AI SDK](https://ai-sdk.dev/)
 - 認証（オプション）: [Clerk](https://clerk.com/)
-- デフォルトのチャットモデルは`llama3`、エンベディングは`mxbai-embed-large`
-- ローカル推論: [Ollama](https://github.com/jmorganca/ollama)
-- 他のクラウドLLM用に設定可能: [Together.ai](https://together.ai/)または[OpenAI API](https://platform.openai.com/)を話すもの。他のクラウドプロバイダーサポート追加のPRは歓迎
+- 対応LLMプロバイダー:
+  - [OpenAI](https://platform.openai.com/)（デフォルト: チャット用）
+  - [Google Gemini](https://ai.google.dev/)（デフォルト: エンベディング用）
+  - [Anthropic Claude](https://www.anthropic.com/)
+  - [Ollama](https://ollama.com/)
+  - [LM Studio](https://lmstudio.ai/)
+  - その他OpenAI互換API
 - 背景音楽生成: [Replicate](https://replicate.com/)で[MusicGen](https://huggingface.co/spaces/facebook/MusicGen)を使用
 
 その他のクレジット:
@@ -89,25 +94,17 @@ npm run dev:backend
 
 ### Docker ComposeでセルフホストされたConvexを使用
 
-ConvexバックエンドをセルフホストされたDockerコンテナで実行することもできます。ここではフロントエンド、バックエンド、ダッシュボードすべてをdocker composeで実行するように設定します。
+ConvexバックエンドをセルフホストされたDockerコンテナで実行することもできます。
+
+#### 初回セットアップ
 
 ```sh
-docker compose up --build -d
-```
-
-`-d`を渡すとコンテナはバックグラウンドで実行し続けます。一度実行したら、サービスを`stop`と`start`できます。
-
-- フロントエンドは http://localhost:5173 で実行
-- バックエンドは http://localhost:3210（http apiは3211）で実行
-- ダッシュボードは http://localhost:6791 で実行
-
-ダッシュボードにログインしてconvex CLIからデプロイするには、管理キーを生成する必要があります。
-
-```sh
+# 管理キーを生成（初回のみ）
+docker compose up -d
 docker compose exec backend ./generate_admin_key.sh
 ```
 
-`.env.local`ファイルに追加します。注: `down`して`up`すると、キーを再生成して`.env.local`ファイルを更新する必要があります。
+`.env.local`ファイルに追加:
 
 ```sh
 # .env.localに
@@ -115,17 +112,24 @@ CONVEX_SELF_HOSTED_ADMIN_KEY="<admin-key>" # 引用符で囲むこと
 CONVEX_SELF_HOSTED_URL="http://127.0.0.1:3210"
 ```
 
-次にConvexバックエンドをセットアップ（初回のみ）:
+注: `docker compose down`して`up`すると、キーを再生成して`.env.local`ファイルを更新する必要があります。
+
+#### 開発サーバーの起動と停止
 
 ```sh
-npm run predev
+# 起動（Docker + Convexバックエンド + フロントエンド全て）
+npm run dev
+
+# 停止
+# 1. Ctrl+C で dev プロセスを停止
+# 2. npm stop で Docker コンテナを停止
 ```
 
-バックエンドに新しいコードを継続的にデプロイしてログを出力するには:
+#### 開発環境のURL
 
-```sh
-npm run dev:backend
-```
+- フロントエンド: http://localhost:5173
+- Convexバックエンド: http://localhost:3210（HTTP APIは3211）
+- Convexダッシュボード: http://localhost:6791
 
 ダッシュボードを見るには、`http://localhost:6791`にアクセスして先ほど生成した管理キーを入力します。
 
@@ -147,80 +151,85 @@ docker compose exec backend /bin/bash curl http://host.docker.internal:11434
 
 ## LLMに接続する
 
-注: クラウドでバックエンドを実行したい場合、クラウドベースのLLM API（OpenAIやTogether.aiなど）を使用するか、クラウドからローカルのOllamaへトラフィックをプロキシできます。手順は[下記](#クラウドデプロイからローカル推論を使用する)を参照。
+このプロジェクトは[Vercel AI SDK](https://ai-sdk.dev/)を使用しており、複数のLLMプロバイダーに対応しています。
 
-### Ollama（デフォルト）
+プロバイダーの設定は `convex/util/llmConfig.ts` を編集して行います。
 
-デフォルトでは、アプリは完全にローカルで実行するためにOllamaを使用しようとします。
+### デフォルト設定（OpenAI + Google）
 
-1. [Ollama](https://ollama.com/)をダウンロードしてインストール
-2. アプリを開くか、ターミナルで`ollama serve`を実行。`ollama serve`はアプリが既に実行中の場合警告を表示
-3. `ollama pull llama3`を実行して`llama3`をダウンロード
-4. `ollama run llama3`でテスト
+デフォルトでは以下の構成を使用します：
+- **チャット**: OpenAI `gpt-5-mini-2025-08-07`
+- **エンベディング**: Google `gemini-embedding-001`（次元数: 3072）
 
-Ollamaモデルオプションは[こちら](https://ollama.ai/library)。
+環境変数を設定:
 
-使用するモデルをカスタマイズしたい場合は、convex/util/llm.tsを調整するか`npx convex env set OLLAMA_MODEL # モデル`を設定。エンベディングモデルを編集する場合:
-
-1. `convex/util/llm.ts`の`OLLAMA_EMBEDDING_DIMENSION`を変更し、以下を確認:
-   `export const EMBEDDING_DIMENSION = OLLAMA_EMBEDDING_DIMENSION;`
-2. `npx convex env set OLLAMA_EMBEDDING_MODEL # モデル`を設定
-
-注: 遅さを感じる場合は、会話プロンプトのサイズを減らすために`constants.ts`の`NUM_MEMORIES_TO_SEARCH`を`1`に設定することを検討。
-
-### OpenAI
-
-OpenAIを使用するには:
-
-```ts
-// convex/util/llm.tsで以下の行を変更:
-export const EMBEDDING_DIMENSION = OPENAI_EMBEDDING_DIMENSION;
+```sh
+npx convex env set OPENAI_API_KEY 'your-openai-key'
+npx convex env set GOOGLE_API_KEY 'your-google-key'
 ```
 
-`OPENAI_API_KEY`環境変数を設定。持っていない場合は https://platform.openai.com/account/api-keys を訪問。
+### OpenAI（チャット + エンベディング両方）
+
+`convex/util/llmConfig.ts`を編集:
+
+```ts
+import { createOpenAI } from '@ai-sdk/openai';
+const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+_chatModel = openai('gpt-4o-mini');
+_embeddingModel = openai.embeddingModel('text-embedding-3-small');
+// EMBEDDING_DIMENSION = 1536; に変更
+```
+
+環境変数を設定:
 
 ```sh
 npx convex env set OPENAI_API_KEY 'your-key'
 ```
 
-オプション: `OPENAI_CHAT_MODEL`と`OPENAI_EMBEDDING_MODEL`でモデルを選択。
+### Anthropic Claude
 
-### Together.ai
-
-Together.aiを使用するには:
+Claude はエンベディングに対応していないため、OpenAI等と併用が必要です。
 
 ```ts
-// convex/util/llm.tsで以下の行を変更:
-export const EMBEDDING_DIMENSION = TOGETHER_EMBEDDING_DIMENSION;
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { createOpenAI } from '@ai-sdk/openai';
+const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export const chatModel = anthropic('claude-sonnet-4-20250514');
+export const embeddingModel = openai.embeddingModel('text-embedding-3-small');
+export const EMBEDDING_DIMENSION = 1536;
 ```
 
-`TOGETHER_API_KEY`環境変数を設定。持っていない場合は https://api.together.xyz/settings/api-keys を訪問。
+### Google Gemini
+
+```ts
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+const google = createGoogleGenerativeAI({ apiKey: process.env.GOOGLE_API_KEY });
+export const chatModel = google('gemini-2.0-flash');
+export const embeddingModel = google.textEmbeddingModel('text-embedding-004');
+export const EMBEDDING_DIMENSION = 768;
+```
+
+### Ollama
+
+```ts
+import { createOllama } from 'ollama-ai-provider';
+const ollama = createOllama({ baseURL: process.env.OLLAMA_HOST || 'http://127.0.0.1:11434/api' });
+export const chatModel = ollama('llama3');
+export const embeddingModel = ollama.embeddingModel('mxbai-embed-large');
+export const EMBEDDING_DIMENSION = 1024;
+```
+
+### エンベディングモデルの変更に関する注意
+
+エンベディングモデルを変更する場合は、データを削除して最初からやり直す必要があります:
 
 ```sh
-npx convex env set TOGETHER_API_KEY 'your-key'
+npx convex run testing:wipeAllTables
+npx convex run init
 ```
 
-オプション: `TOGETHER_CHAT_MODEL`、`TOGETHER_EMBEDDING_MODEL`でモデルを選択。エンベディングモデルの次元は`EMBEDDING_DIMENSION`と一致する必要あり。
-
-### その他のOpenAI互換API
-
-Anthropic、Groq、Azureなど、OpenAI互換APIを使用できます。
-
-- `convex/util/llm.ts`の`EMBEDDING_DIMENSION`をエンベディングモデルの次元に合わせて変更
-- `llm.ts`の`getLLMConfig`を編集するか環境変数を設定:
-
-```sh
-npx convex env set LLM_API_URL 'your-url'
-npx convex env set LLM_API_KEY 'your-key'
-npx convex env set LLM_MODEL 'your-chat-model'
-npx convex env set LLM_EMBEDDING_MODEL 'your-embedding-model'
-```
-
-注: `LLM_API_KEY`が不要な場合は設定しないでください。
-
-### LLMプロバイダーまたはエンベディングモデルの変更に関する注意:
-
-LLMプロバイダーまたはエンベディングモデルを変更する場合は、データを削除して最初からやり直す必要があります。メモリに使用されるエンベディングは選択したエンベディングモデルに基づいており、ベクトルデータベースの次元はエンベディングモデルの次元と一致する必要があります。方法は[下記](#データベースをワイプして最初からやり直す)を参照。
+チャットモデルのみの変更ではワイプは不要です。
 
 ## 独自のシミュレーションをカスタマイズ
 

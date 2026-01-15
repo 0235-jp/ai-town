@@ -60,7 +60,6 @@ export async function rememberConversation(
   llmMessages.push({ role: 'user', content: 'Summary:' });
   const { content } = await chatCompletion({
     messages: llmMessages,
-    max_tokens: 500,
   });
   const description = `Conversation with ${otherPlayer.name} at ${new Date(
     data.conversation._creationTime,
@@ -254,7 +253,6 @@ async function calculateImportance(description: string) {
       },
     ],
     temperature: 0.0,
-    max_tokens: 1,
   });
 
   let importance = parseFloat(importanceRaw);

@@ -1,7 +1,7 @@
 'use node';
 
 import { generateText, embed, embedMany } from 'ai';
-import { getChatModel, getEmbeddingModel, EMBEDDING_DIMENSION } from './llmConfig';
+import { getChatModel, getEmbeddingModel, EMBEDDING_DIMENSION, CHAT_CONFIG } from './llmConfig';
 
 export { EMBEDDING_DIMENSION };
 
@@ -22,16 +22,33 @@ export async function chatCompletion(
 ): Promise<{ content: string; retries: number; ms: number }> {
   const start = Date.now();
 
+  // リーズニング設定（Claude extended thinking / OpenAI reasoning）
+  const { anthropicBudgetTokens, openaiEffort } = CHAT_CONFIG.reasoning;
+  const providerOptions =
+    anthropicBudgetTokens || openaiEffort
+      ? {
+          ...(anthropicBudgetTokens && {
+            anthropic: {
+              thinking: { type: 'enabled' as const, budgetTokens: anthropicBudgetTokens },
+            },
+          }),
+          ...(openaiEffort && {
+            openai: {
+              reasoningEffort: openaiEffort,
+            },
+          }),
+        }
+      : undefined;
+
+  const maxTokens = options.max_tokens ?? CHAT_CONFIG.maxOutputTokens;
+
   const { text } = await generateText({
     model: getChatModel(),
     messages: options.messages,
-    maxOutputTokens: options.max_tokens,
+    ...(maxTokens !== undefined && { maxOutputTokens: maxTokens }),
     temperature: options.temperature,
-    stopSequences: options.stop
-      ? Array.isArray(options.stop)
-        ? options.stop
-        : [options.stop]
-      : undefined,
+    stopSequences: options.stop ? (Array.isArray(options.stop) ? options.stop : [options.stop]) : undefined,
+    providerOptions,
   });
 
   return { content: text, retries: 0, ms: Date.now() - start };
@@ -45,7 +62,9 @@ export async function fetchEmbedding(
     model: getEmbeddingModel(),
     value: text.replace(/\n/g, ' '),
   });
-  return { embedding, retries: 0, ms: Date.now() - start };
+  const ms = Date.now() - start;
+  console.log(`[Embedding] dim=${embedding.length}, ms=${ms}`);
+  return { embedding, retries: 0, ms };
 }
 
 export async function fetchEmbeddingBatch(
@@ -56,10 +75,12 @@ export async function fetchEmbeddingBatch(
     model: getEmbeddingModel(),
     values: texts.map((text) => text.replace(/\n/g, ' ')),
   });
+  const ms = Date.now() - start;
+  console.log(`[EmbeddingBatch] count=${texts.length}, dim=${embeddings[0]?.length ?? 0}, ms=${ms}`);
   return {
     ollama: false,
     embeddings,
     retries: 0,
-    ms: Date.now() - start,
+    ms,
   };
 }

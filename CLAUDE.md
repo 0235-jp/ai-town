@@ -8,8 +8,12 @@
 # 依存関係のインストール
 npm install
 
-# 開発サーバー起動（フロントエンド + バックエンド同時）
+# 開発サーバー起動（Docker + Convexバックエンド + フロントエンド全て）
 npm run dev
+
+# 停止
+# 1. Ctrl+C で dev プロセスを停止
+# 2. npm stop で Docker コンテナを停止
 
 # フロントエンドとバックエンドを別々に起動（デバッグに便利）
 npm run dev:frontend   # Vite開発サーバー http://localhost:5173
@@ -27,6 +31,12 @@ npm test
 # Convexダッシュボードを開く
 npm run dashboard
 ```
+
+### 開発環境のURL
+- フロントエンド: http://localhost:5173
+- Convexバックエンド: http://localhost:3210
+- Convex HTTP API: http://localhost:3211
+- Convexダッシュボード: http://localhost:6791
 
 ## Convex CLIコマンド
 
@@ -79,10 +89,14 @@ AIキャラクターが仮想の町で生活し、チャットし、交流する
 - `memory.ts` - 関連コンテキストのためのベクトルベースメモリ検索
 - `embeddingsCache.ts` - API呼び出しを減らすためのエンベディングキャッシュ
 
-**LLM設定 (`convex/util/llm.ts`):**
-- Ollama（デフォルト）、OpenAI、Together.ai、またはカスタムOpenAI互換APIをサポート
-- **重要:** `EMBEDDING_DIMENSION`定数は選択したプロバイダーと一致させる必要あり（Ollama=1024, OpenAI=1536, Together=768）
-- プロバイダーを変更する場合はデータのワイプが必要: エンベディングはプロバイダー固有
+**LLM設定 (`convex/util/llmConfig.ts` + `llm.ts`):**
+- Vercel AI SDKを使用
+- **デフォルト設定:**
+  - チャット: OpenAI `gpt-5-mini-2025-08-07`
+  - エンベディング: Google `gemini-embedding-001`（次元数: 3072）
+- 対応プロバイダー: OpenAI、Anthropic、Google、Ollama、LM Studio、カスタム
+- `llmConfig.ts`でプロバイダーを設定し、`EMBEDDING_DIMENSION`を変更
+- **重要:** エンベディングモデルを変更する場合はデータのワイプが必要
 
 ### フロントエンド (React + PixiJS) - `src/`
 
@@ -112,4 +126,4 @@ AIキャラクターが仮想の町で生活し、チャットし、交流する
 
 **マップ:** Tiledエディタを使用し、JSONをエクスポートし、`node data/convertMap.js <mapDataPath> <assetPath> <tilesetpxw> <tilesetpxh>`を実行。
 
-**LLMプロバイダー:** `convex/util/llm.ts`の`EMBEDDING_DIMENSION`を変更し、適切な環境変数を設定。プロバイダー変更後は必ずデータをワイプすること。
+**LLMプロバイダー:** `convex/util/llmConfig.ts`を編集してプロバイダーを切り替え。対応: LM Studio, OpenAI, Anthropic, Google, Ollama, カスタム。エンベディングモデル変更時はデータをワイプすること。
