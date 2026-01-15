@@ -50,6 +50,7 @@ import type * as util_compression from "../util/compression.js";
 import type * as util_geometry from "../util/geometry.js";
 import type * as util_isSimpleObject from "../util/isSimpleObject.js";
 import type * as util_llm from "../util/llm.js";
+import type * as util_llmConfig from "../util/llmConfig.js";
 import type * as util_minheap from "../util/minheap.js";
 import type * as util_object from "../util/object.js";
 import type * as util_sleep from "../util/sleep.js";
@@ -103,6 +104,7 @@ declare const fullApi: ApiFromModules<{
   "util/geometry": typeof util_geometry;
   "util/isSimpleObject": typeof util_isSimpleObject;
   "util/llm": typeof util_llm;
+  "util/llmConfig": typeof util_llmConfig;
   "util/minheap": typeof util_minheap;
   "util/object": typeof util_object;
   "util/sleep": typeof util_sleep;
